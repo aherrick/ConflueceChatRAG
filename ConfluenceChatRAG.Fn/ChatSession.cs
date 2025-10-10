@@ -1,0 +1,54 @@
+using ConfluenceChatRAG.Data.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+
+namespace ConfluenceChatRAG.Fn;
+
+/// <summary>
+/// Optional endpoints for managing chat sessions
+/// </summary>
+public class ChatSession(ILogger<ChatSession> logger, ChatHistoryService historyService)
+{
+    /// <summary>
+    /// Get chat history for a session
+    /// GET /api/ChatSession/{sessionId}/history
+    /// </summary>
+    [Function("GetSessionHistory")]
+    public async Task<IActionResult> GetSessionHistory(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "get",
+            Route = "ChatSession/{sessionId}/history"
+        )]
+            HttpRequest req,
+        string sessionId
+    )
+    {
+        var history = await historyService.GetHistoryAsync(sessionId);
+
+        if (history.Count == 0)
+        {
+            return new NotFoundObjectResult(new { error = "Session not found" });
+        }
+
+        // Only include suggestions for the last assistant message
+        var lastAssistantEntry = history.LastOrDefault(e => e.Role == "assistant");
+        foreach (var entry in history)
+        {
+            if (entry != lastAssistantEntry)
+            {
+                entry.Suggestions = []; // Clear suggestions for non-last messages
+            }
+        }
+
+        logger.LogInformation(
+            "Retrieved history for session: {SessionId}, {Count} messages",
+            sessionId,
+            history.Count
+        );
+
+        return new OkObjectResult(history);
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ConfluenceChatRAG.Fn": {
+      "commandName": "Project",
+      // "commandLineArgs": "--port 7082 --useHttps --cert certificate.pfx --password 123",
+
+      "commandLineArgs": "--port 7082",
+
+      "launchBrowser": false
+    }
+  }
+}
