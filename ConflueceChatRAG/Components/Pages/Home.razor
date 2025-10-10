@@ -136,7 +136,7 @@
                            disabled="@_busy" />
                     <button type="submit"
                             class="btn btn-primary"
-                            disabled="@(_busy || string.IsNullOrWhiteSpace(_input))">
+                            disabled=@(_busy || string.IsNullOrWhiteSpace(_input))>
                         @if (_busy)
                         {
                             <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
