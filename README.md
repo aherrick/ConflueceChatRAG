@@ -1,10 +1,10 @@
-# ?? Confluence Chat RAG
+﻿# 🚀 Confluence Chat RAG
 
 [![build](https://github.com/aherrick/ConflueceChatRAG/actions/workflows/build.yml/badge.svg)](https://github.com/aherrick/ConflueceChatRAG/actions/workflows/build.yml)
 
-A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI and Azure AI Search for intelligent, context-aware responses from Confluence documentation. ????
+A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI and Azure AI Search for intelligent, context-aware responses from Confluence documentation. 🤖📚
 
-## ??? Stack
+## 🛠️ Stack
 
 - **.NET 10** - Blazor Server + Azure Functions
 - **Azure OpenAI** - GPT-4.1 for chat completion
@@ -12,13 +12,13 @@ A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI 
 - **SQL Server** - Persistent chat history with EF Core
 - **Bootstrap 5** - UI framework
 
-## ?? Projects
+## 📦 Projects
 
 - **ConfluenceChatRAG** - Blazor Server UI
 - **ConfluenceChatRAG.Fn** - Azure Functions API (chat, history)
 - **ConfluenceChatRAG.Data** - Shared models and services
 
-## ? Quick Start
+## ⚡ Quick Start
 
 1. **Configure `local.settings.json`** in `ConfluenceChatRAG.Fn`:
    ```json
@@ -49,7 +49,7 @@ A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI 
    .\start-azurite.ps1
    ```
 
-## ?? How to Run
+## ▶️ How to Run
 
 You must run both the Blazor Server app and the Azure Functions API at the same time:
 
@@ -61,17 +61,17 @@ dotnet run --project ConflueceChatRAG
 dotnet run --project ConfluenceChatRAG.Fn
 ```
 
-The Blazor app will communicate with the API via HTTP while both are running. ???????
+The Blazor app will communicate with the API via HTTP while both are running. 🖥️🔗🧩
 
-## ? Features
+## ✨ Features
 
-- ?? **Persistent Chat History** - SQL database with EF Core
-- ??? **Session Management** - GUID-based sessions, reload to restore
-- ?? **Markdown Rendering** - Assistant responses rendered with Markdig
-- ?? **Source Citations** - Links to Confluence pages used in responses
-- ?? **Suggestions** - Follow-up question recommendations
-- ?? **Vector Search** - Semantic search via Azure AI Search
+- 💾 **Persistent Chat History** - SQL database with EF Core
+- 🗂️ **Session Management** - GUID-based sessions, reload to restore
+- 📝 **Markdown Rendering** - Assistant responses rendered with Markdig
+- 🔗 **Source Citations** - Links to Confluence pages used in responses
+- 💡 **Suggestions** - Follow-up question recommendations
+- 🧠 **Vector Search** - Semantic search via Azure AI Search
 
 ---
 
-Made with ?? using Blazor, Azure, and OpenAI.
+Made with ❤️ using Blazor, Azure, and OpenAI.
