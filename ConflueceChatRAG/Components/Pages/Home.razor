@@ -26,11 +26,7 @@
 
     <!-- Messages -->
     <div class="flex-grow-1 overflow-auto p-3" style="background: #f8f9fa;" id="messages" @ref="_messagesEl">
-        @if (_messages == null)
-        {
-            <!-- Loading state - prevents flash of empty content -->
-        }
-        else if (_messages.Count == 0)
+        @if (_messages.Count == 0)
         {
             <div class="text-center text-muted mt-5">
                 <p>Ask a question to get started.</p>
@@ -221,33 +217,26 @@
 
     private async Task LoadChatHistoryAsync()
     {
-        try
+        var response = await Api.GetAsync($"/api/ChatSession/{_sessionId}/history");
+        if (response.IsSuccessStatusCode)
         {
-            var response = await Api.GetAsync($"/api/ChatSession/{_sessionId}/history");
-            if (response.IsSuccessStatusCode)
+            var historyData = await response.Content.ReadFromJsonAsync<List<ChatMessageEntity>>();
+            if (historyData?.Count > 0)
             {
-                var historyData = await response.Content.ReadFromJsonAsync<List<ChatMessageEntity>>();
-                if (historyData?.Count > 0)
+                _messages = [];
+                foreach (var msg in historyData)
                 {
-                    _messages = [];
-                    foreach (var msg in historyData)
+                    _messages.Add(new ChatMessage
                     {
-                        _messages.Add(new ChatMessage
-                        {
-                            IsUser = msg.Role == "user",
-                            Text = msg.Content,
-                            Time = DateTimeOffset.UtcNow,
-                            Sources = msg.Sources ?? [],
-                            Suggestions = msg.Suggestions ?? []
-                        });
-                    }
-                    _pendingScroll = true;
+                        IsUser = msg.Role == "user",
+                        Text = msg.Content,
+                        Time = DateTimeOffset.UtcNow,
+                        Sources = msg.Sources ?? [],
+                        Suggestions = msg.Suggestions ?? []
+                    });
                 }
+                _pendingScroll = true;
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to load chat history: {ex.Message}");
         }
     }
 
