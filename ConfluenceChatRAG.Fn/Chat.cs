@@ -19,7 +19,7 @@ public class Chat(ILogger<Chat> logger, IConfiguration config, ChatHistoryServic
         var appConfig = config.Get<AppConfig>();
 
         // Read and deserialize request body
-        ChatRequestDto request = await req.ReadFromJsonAsync<ChatRequestDto>();
+    ChatMessageDto request = await req.ReadFromJsonAsync<ChatMessageDto>();
 
         // Handle session creation/retrieval
         var sessionId =
@@ -58,7 +58,7 @@ public class Chat(ILogger<Chat> logger, IConfiguration config, ChatHistoryServic
         await historyService.AddAssistantMessageAsync(sessionId, answer, sources, suggestions);
 
         return new OkObjectResult(
-            new ChatResponseDto
+            new ChatMessageDto
             {
                 SessionId = sessionId,
                 Question = request.Question,
