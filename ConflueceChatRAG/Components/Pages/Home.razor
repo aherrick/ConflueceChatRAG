@@ -256,7 +256,7 @@
 		_messages.Add(userMessage);
 
 		// Placeholder assistant bubble (shows spinner because Content empty while _busy true)
-		var assistantPlaceholder = new ChatMessageEntity { IsUser = false, SessionId = _sessionId };
+	var assistantPlaceholder = new ChatMessageEntity { IsUser = false, SessionId = _sessionId, Timestamp = DateTimeOffset.UtcNow };
 		_messages.Add(assistantPlaceholder);
 
 		_busy = true;
