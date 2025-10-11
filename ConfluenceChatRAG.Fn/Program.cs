@@ -20,8 +20,8 @@ builder.Services.AddDbContextFactory<ChatHistoryDbContext>(options =>
     {
         // Enable connection resiliency with automatic retries for transient failures
         sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,           // Retry up to 5 times
-            maxRetryDelay: TimeSpan.FromSeconds(30),  // Max delay between retries
+            maxRetryCount: 10,           // Retry up to 10 times
+            maxRetryDelay: TimeSpan.FromSeconds(60),  // Max delay between retries
             errorNumbersToAdd: null);   // Use default transient error numbers
     });
     // Default to NoTracking to keep read operations lightweight. When an update is required,
