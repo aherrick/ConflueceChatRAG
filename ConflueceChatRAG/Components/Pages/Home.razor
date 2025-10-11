@@ -83,7 +83,7 @@
 									</div>
 								}
 							}
-							<div class="small @(m.IsUser ? "text-white-50" : "text-muted") mt-1">@m.Timestamp.ToLocalTime()</div>
+							<div class="small @(m.IsUser ? "text-white-50" : "text-muted") mt-1">@m.Timestamp.ToLocalTime().ToString("MM/dd/yyyy, h:mm:ss tt")</div>
 
 							@if (m.Sources?.Count > 0)
 							{
