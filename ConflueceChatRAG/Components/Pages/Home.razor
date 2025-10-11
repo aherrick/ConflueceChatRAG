@@ -10,300 +10,300 @@
 @using Markdig
 
 <div class="d-flex flex-column h-100">
-    <!-- Header -->
-    <div class="border-bottom bg-white px-3 py-2 d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-            <img src="data:image/png;base64,@Configuration["LogoBase64"]" alt="Supply Chain Cloud" style="height: 32px;" />
-            <h5 class="mb-0">Confluence Chat</h5>
-        </div>
-        <div class="d-flex gap-2">
-            @if (!string.IsNullOrEmpty(_sessionId))
-            {
-                <button @onclick="StartNewChat" class="btn btn-sm btn-outline-secondary">New Chat</button>
-            }
-        </div>
-    </div>
+	<!-- Header -->
+	<div class="border-bottom bg-white px-3 py-2 d-flex align-items-center justify-content-between">
+		<div class="d-flex align-items-center gap-2">
+			<img src="data:image/png;base64,@Configuration["LogoBase64"]" alt="Supply Chain Cloud" style="height: 32px;" />
+			<h5 class="mb-0">Confluence Chat</h5>
+		</div>
+		<div class="d-flex gap-2">
+			@if (!string.IsNullOrEmpty(_sessionId))
+			{
+				<button @onclick="StartNewChat" class="btn btn-sm btn-outline-secondary">New Chat</button>
+			}
+		</div>
+	</div>
 
-    <!-- Messages -->
-    <div class="flex-grow-1 overflow-auto p-3" style="background: #f8f9fa;" id="messages" @ref="_messagesEl">
-        @if (_messages.Count == 0)
-        {
-            <div class="text-center text-muted mt-5">
-                <p>Ask a question to get started.</p>
-            </div>
-        }
-        else
-        {
-            <div class="mx-auto" style="max-width: 800px;">
-                @foreach (var m in _messages)
-                {
-                    <div class="d-flex mb-3 @(m.IsUser ? "justify-content-end" : "justify-content-start")">
-                        <div class="@(m.IsUser ? "bg-primary text-white" : "bg-white border") rounded-3 p-3" style="max-width: 75%;">
-                            <div class="small fw-semibold mb-1 @(m.IsUser ? "text-white-50" : "text-muted")">
-                                @if (m.IsUser)
-                                {
-                                    <span>You</span>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-stars me-1"></i><span>Assistant</span>
-                                }
-                            </div>
-                            @if (!m.IsUser && _busy && string.IsNullOrEmpty(m.Content))
-                            {
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <span class="text-muted">Thinking...</span>
-                                </div>
-                            }
-                            else if (!string.IsNullOrEmpty(m.Content))
-                            {
-                                @if (m.IsUser)
-                                {
-                                    <div style="white-space: pre-wrap;">@m.Content</div>
-                                }
-                                else
-                                {
-                                    <div class="markdown-content">
-                                        @((MarkupString)Markdown.ToHtml(m.Content))
-                                    </div>
-                                }
-                            }
-                            <div class="small @(m.IsUser ? "text-white-50" : "text-muted") mt-1">@m.Timestamp.ToLocalTime().ToString("g")</div>
+	<!-- Messages -->
+	<div class="flex-grow-1 overflow-auto p-3" style="background: #f8f9fa;" id="messages" @ref="_messagesEl">
+		@if (_messages.Count == 0)
+		{
+			@if (!string.IsNullOrEmpty(_sessionId))
+			{
+				<div class="text-center text-muted mt-5">
+					<div class="spinner-border text-primary mb-3" role="status"><span class="visually-hidden">Loading...</span></div>
+					<p>Loading conversation history...</p>
+				</div>
+			}
+			else
+			{
+				<div class="text-center text-muted mt-5">
+					<p>Ask a question to get started.</p>
+				</div>
+			}
+		}
+		else
+		{
+			<div class="mx-auto" style="max-width: 800px;">
+				@foreach (var m in _messages)
+				{
+					<div class="d-flex mb-3 @(m.IsUser ? "justify-content-end" : "justify-content-start")">
+						<div class="@(m.IsUser ? "bg-primary text-white" : "bg-white border") rounded-3 p-3" style="max-width: 75%;">
+							<div class="small fw-semibold mb-1 @(m.IsUser ? "text-white-50" : "text-muted")">
+								@if (m.IsUser)
+								{
+									<span>You</span>
+								}
+								else
+								{
+									<i class="bi bi-stars me-1"></i>
+						
+									<span>Assistant</span>
+								}
+							</div>
+							@if (!m.IsUser && _busy && string.IsNullOrEmpty(m.Content))
+							{
+								<div class="d-flex align-items-center gap-2">
+									<div class="spinner-border spinner-border-sm text-primary" role="status">
+										<span class="visually-hidden">Loading...</span>
+									</div>
+									<span class="text-muted">Thinking...</span>
+								</div>
+							}
+							else if (!string.IsNullOrEmpty(m.Content))
+							{
+								@if (m.IsUser)
+								{
+									<div style="white-space: pre-wrap;">@m.Content</div>
+								}
+								else
+								{
+									<div class="markdown-content">
+										@((MarkupString)Markdown.ToHtml(m.Content))
+									</div>
+								}
+							}
+							<div class="small @(m.IsUser ? "text-white-50" : "text-muted") mt-1">@m.Timestamp.ToLocalTime().ToString("g")</div>
 
-                            @if (m.Sources?.Count > 0)
-                            {
-                                <div class="mt-2 pt-2 border-top">
-                                    <div class="small fw-semibold text-muted">Sources:</div>
-                                    <ul class="small mb-0 mt-1">
-                                        @foreach (var s in m.Sources)
-                                        {
-                                            <li>
-                                                @if (!string.IsNullOrEmpty(s.Url))
-                                                {
-                                                    <a href="@s.Url" target="_blank">@s.Title</a>
-                                                }
-                                                else
-                                                {
-                                                    <span>@s.Title</span>
-                                                }
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
-                            }
+							@if (m.Sources?.Count > 0)
+							{
+								<div class="mt-2 pt-2 border-top">
+									<div class="small fw-semibold text-muted">Sources:</div>
+									<ul class="small mb-0 mt-1">
+										@foreach (var s in m.Sources)
+										{
+											<li>
+												@if (!string.IsNullOrEmpty(s.Url))
+												{
+													<a href="@s.Url" target="_blank">@s.Title</a>
+												}
+												else
+												{
+													<span>@s.Title</span>
+												}
+											</li>
+										}
+									</ul>
+								</div>
+							}
 
-                            @if (m.Suggestions?.Count > 0)
-                            {
-                                <div class="mt-2 pt-2 border-top">
-                                    <div class="small fw-semibold text-muted mb-2">You might also want to ask:</div>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        @foreach (var suggestion in m.Suggestions)
-                                        {
-                                            <button @onclick="() => AskSuggestion(suggestion)" 
-                                                    class="btn btn-sm btn-outline-primary" 
-                                                    disabled="@_busy"
-                                                    style="font-size: 0.85rem;">
-                                                @suggestion
-                                            </button>
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-    </div>
+							@if (m.Suggestions?.Count > 0)
+							{
+								<div class="mt-2 pt-2 border-top">
+									<div class="small fw-semibold text-muted mb-2">You might also want to ask:</div>
+									<div class="d-flex flex-wrap gap-2">
+										@foreach (var suggestion in m.Suggestions)
+										{
+											<button @onclick="() => AskSuggestion(suggestion)"
+													class="btn btn-sm btn-outline-primary"
+													disabled="@_busy"
+													style="font-size: 0.85rem;">
+												@suggestion
+											</button>
+										}
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		}
+	</div>
 
-    <!-- Input -->
-    <div class="border-top bg-white p-3">
-        <div class="mx-auto" style="max-width: 800px;">
-            <EditForm Model="@this" OnValidSubmit="SendAsync">
-                <div class="input-group">
-                    <input @ref="_inputElement"
-                           class="form-control"
-                           placeholder="Type your question..."
-                           @bind="_input"
-                           @bind:event="oninput"
-                           disabled="@_busy" />
-                    <button type="submit"
-                            class="btn btn-primary"
-                            disabled=@(_busy || string.IsNullOrWhiteSpace(_input))>
-                        @if (_busy)
-                        {
-                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                            <span>Sending...</span>
-                        }
-                        else
-                        {
-                            <span>Send</span>
-                        }
-                    </button>
-                </div>
-            </EditForm>
-            <div class="text-center mt-2">
-                <small class="text-muted">Powered by <strong>GPT-4.1</strong></small>
-            </div>
-        </div>
-    </div>
+	<!-- Input -->
+	<div class="border-top bg-white p-3">
+		<div class="mx-auto" style="max-width: 800px;">
+			<EditForm Model="@this" OnValidSubmit="SendAsync">
+				<div class="input-group">
+					<input @ref="_inputElement"
+						   class="form-control"
+						   placeholder="Type your question..."
+						   @bind="_input"
+						   @bind:event="oninput"
+						   disabled="@_busy" />
+					<button type="submit"
+							class="btn btn-primary"
+							disabled=@(_busy || string.IsNullOrWhiteSpace(_input))>
+						@if (_busy)
+						{
+							<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+							<span>Sending...</span>
+						}
+						else
+						{
+							<span>Send</span>
+						}
+					</button>
+				</div>
+			</EditForm>
+			<div class="text-center mt-2">
+				<small class="text-muted">Powered by <strong>GPT-4.1</strong></small>
+			</div>
+		</div>
+	</div>
 </div>
 
 <!-- Inline tiny JS helper (no wwwroot file needed) -->
 <script>
-    window.__scrollToBottom = (el) => {
-      if (!el) return;
-      requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
-    };
+	window.__scrollToBottom = (el) => {
+	  if (!el) return;
+	  requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+	};
 </script>
 
 @code {
-    [Parameter]
-    public string SessionId { get; set; }
+	[Parameter]
+	public string SessionId { get; set; }
 
-    private List<ChatMessageEntity> _messages = null;
-    private string _input = string.Empty;
-    private bool _busy;
-    private string _sessionId;
-    private ElementReference _inputElement;
+	private List<ChatMessageEntity> _messages = new();
+	private string _input = string.Empty;
+	private bool _busy;
+	private string _sessionId;
+	private ElementReference _inputElement;
 
-    // Scroll state + element ref
-    private bool _pendingScroll;
-    private ElementReference _messagesEl;
+	// Scroll state + element ref
+	private bool _pendingScroll;
+	private ElementReference _messagesEl;
 
-    private HttpClient Api => ClientFactory.CreateClient("api");
+	private HttpClient Api => ClientFactory.CreateClient("api");
 
-    protected override async Task OnInitializedAsync()
-    {
-        _sessionId = SessionId;
+	protected override async Task OnInitializedAsync()
+	{
+		_sessionId = SessionId;
 
-        if (!string.IsNullOrEmpty(_sessionId))
-        {
-            await LoadChatHistoryAsync();
-        }
-        
-        // Ensure _messages is always set after loading
-        if (_messages == null)
-        {
-            _messages = [];
-        }
-    }
+		if (!string.IsNullOrEmpty(_sessionId))
+		{
+			await LoadChatHistoryAsync();
+		}
 
-    // Perform scroll after render when flagged
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            try
-            {
-                await _inputElement.FocusAsync();
-            }
-            catch { /* ignore */ }
-        }
-        
-        if (_pendingScroll)
-        {
-            _pendingScroll = false;
-            try
-            {
-                await JS.InvokeVoidAsync("__scrollToBottom", _messagesEl);
-            }
-            catch { /* ignore */ }
-        }
-    }
+		// _messages initialized upfront; no null guard needed here.
+	}
 
-    private async Task LoadChatHistoryAsync()
-    {
-        var response = await Api.GetAsync($"/api/ChatSession/{_sessionId}/history");
-        if (response.IsSuccessStatusCode)
-        {
-            var historyData = await response.Content.ReadFromJsonAsync<List<ChatMessageEntity>>();
-            if (historyData?.Count > 0)
-            {
-                _messages = historyData;
-                _pendingScroll = true;
-            }
-        }
-    }
+	// Perform scroll after render when flagged
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			try
+			{
+				await _inputElement.FocusAsync();
+			}
+			catch { /* ignore */ }
+		}
 
-    private void StartNewChat()
-    {
-        _sessionId = null;
-        _messages.Clear();
-        Navigation.NavigateTo("/", forceLoad: false);
-        _pendingScroll = true;
-    }
+		if (_pendingScroll)
+		{
+			_pendingScroll = false;
+			try
+			{
+				await JS.InvokeVoidAsync("__scrollToBottom", _messagesEl);
+			}
+			catch { /* ignore */ }
+		}
+	}
 
-    private async Task SendAsync()
-    {
-        if (string.IsNullOrWhiteSpace(_input)) return;
+	private async Task LoadChatHistoryAsync()
+	{
+		var response = await Api.GetAsync($"/api/ChatSession/{_sessionId}/history");
+		if (response.IsSuccessStatusCode)
+		{
+			var historyData = await response.Content.ReadFromJsonAsync<List<ChatMessageEntity>>();
+			if (historyData?.Count > 0)
+			{
+				_messages = historyData;
+				_pendingScroll = true;
+			}
+		}
+	}
 
-        var question = _input.Trim();
-        _input = string.Empty;
+	private void StartNewChat()
+	{
+		_sessionId = null;
+		_messages.Clear();
+		Navigation.NavigateTo("/", forceLoad: false);
+		_pendingScroll = true;
+	}
 
-    var userMessage = new ChatMessageEntity { IsUser = true, Content = question, Timestamp = DateTimeOffset.UtcNow, SessionId = _sessionId };
-        _messages.Add(userMessage);
+	private async Task SendAsync()
+	{
+		if (string.IsNullOrWhiteSpace(_input)) return;
 
-        // Add assistant message placeholder
-    var assistantMessage = new ChatMessageEntity { IsUser = false, Timestamp = DateTimeOffset.UtcNow, SessionId = _sessionId };
-        _messages.Add(assistantMessage);
+		var question = _input.Trim();
+		_input = string.Empty;
 
-        _busy = true;
-        _pendingScroll = true;
-        StateHasChanged();
+		var userMessage = new ChatMessageEntity { IsUser = true, Content = question, Timestamp = DateTimeOffset.UtcNow, SessionId = _sessionId };
+		_messages.Add(userMessage);
 
-        try
-        {
-            var req = new ChatMessageEntity { IsUser = true, Content = question, SessionId = _sessionId };
-            var resp = await Api.PostAsJsonAsync("/api/chat", req);
+		// Placeholder assistant bubble (shows spinner because Content empty while _busy true)
+		var assistantPlaceholder = new ChatMessageEntity { IsUser = false, SessionId = _sessionId };
+		_messages.Add(assistantPlaceholder);
 
-            if (!resp.IsSuccessStatusCode)
-            {
-                assistantMessage.Content = $"Error {(int)resp.StatusCode}: {resp.ReasonPhrase}";
-                _pendingScroll = true;
-                return;
-            }
+		_busy = true;
+		_pendingScroll = true;
+		StateHasChanged();
 
-            var dto = await resp.Content.ReadFromJsonAsync<ChatMessageEntity>();
+		try
+		{
+			var resp = await Api.PostAsJsonAsync("/api/chat", userMessage);
 
-            if (dto?.SessionId != null && _sessionId != dto.SessionId)
-            {
-                _sessionId = dto.SessionId;
-                Navigation.NavigateTo($"/{_sessionId}", forceLoad: false);
-            }
+			if (!resp.IsSuccessStatusCode)
+			{
+				assistantPlaceholder.Content = $"Error {(int)resp.StatusCode}: {resp.ReasonPhrase}";
+				return;
+			}
 
-            // Update the existing message with actual response
-            assistantMessage.Content = dto?.Content ?? "(empty response)";
-            assistantMessage.Sources = dto?.Sources ?? [];
-            assistantMessage.Suggestions = dto?.Suggestions ?? [];
+			var dto = await resp.Content.ReadFromJsonAsync<ChatMessageEntity>();
 
-            _pendingScroll = true;
-        }
-        catch (Exception ex)
-        {
-            assistantMessage.Content = $"Request failed: {ex.Message}";
-            _pendingScroll = true;
-        }
-        finally
-        {
-            assistantMessage.Timestamp = DateTimeOffset.UtcNow;
-            _busy = false;
-            StateHasChanged();
-            await Task.Delay(100);
-            await _inputElement.FocusAsync();
-        }
-    }
+			// Assume valid dto on success path; no null/exception branching needed.
+			if (dto?.SessionId != null && _sessionId != dto.SessionId)
+			{
+				_sessionId = dto.SessionId;
+				Navigation.NavigateTo($"/{_sessionId}", forceLoad: false);
+			}
 
-    private void AskSuggestion(string question)
-    {
-        _input = question;
-        StateHasChanged();
-        // Automatically send the question
-        _ = SendAsync();
-    }
+			// Replace placeholder with server-provided entity
+			_messages.Remove(assistantPlaceholder);
+			_messages.Add(dto);
 
-    // Single unified ChatMessageEntity model used across UI/API/DB
+		}
+		finally
+		{
+			_pendingScroll = true;
+			_busy = false;
+			StateHasChanged();
+			await Task.Delay(100);
+			await _inputElement.FocusAsync();
+		}
+	}
+
+	private void AskSuggestion(string question)
+	{
+		_input = question;
+		StateHasChanged();
+		// Automatically send the question
+		_ = SendAsync();
+	}
+
+	// Single unified ChatMessageEntity model used across UI/API/DB
 }
