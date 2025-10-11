@@ -2,34 +2,18 @@ using ConflueceChatRAG.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder
-    .Services.AddHttpClient(
-        "api",
-        client =>
-        {
-#if DEBUG
-            client.BaseAddress = new Uri("http://localhost:7082");
-#else
-            client.BaseAddress = new Uri(
-                Environment.GetEnvironmentVariable("ConfluenceChatApiUrl")
-            );
-#endif
-            client.Timeout = Timeout.InfiniteTimeSpan;
-        }
-    )
-    .ConfigurePrimaryHttpMessageHandler(() =>
+builder.Services.AddHttpClient(
+    "api",
+    client =>
     {
 #if DEBUG
-        // For local development, trust self-signed certificates
-        return new HttpClientHandler
-        {
-            ServerCertificateCustomValidationCallback =
-                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
-        };
+        client.BaseAddress = new Uri("http://localhost:7082");
 #else
-        return new HttpClientHandler();
+        client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("ConfluenceChatApiUrl"));
 #endif
-    });
+        client.Timeout = Timeout.InfiniteTimeSpan;
+    }
+);
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
