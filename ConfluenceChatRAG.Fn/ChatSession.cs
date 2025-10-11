@@ -26,29 +26,29 @@ public class ChatSession(ILogger<ChatSession> logger, ChatHistoryService history
         string sessionId
     )
     {
-        var history = await historyService.GetHistoryAsync(sessionId);
+        var entities = await historyService.GetHistoryAsync(sessionId);
 
-        if (history.Count == 0)
+        if (entities.Count == 0)
         {
             return new NotFoundObjectResult(new { error = "Session not found" });
         }
 
         // Only include suggestions for the last assistant message
-        var lastAssistantEntry = history.LastOrDefault(e => e.Role == "assistant");
-        foreach (var entry in history)
+    var lastAssistantEntry = entities.LastOrDefault(e => !e.IsUser);
+        foreach (var entry in entities)
         {
             if (entry != lastAssistantEntry)
             {
-                entry.Suggestions = []; // Clear suggestions for non-last messages
+                entry.Suggestions = [];
             }
         }
 
         logger.LogInformation(
             "Retrieved history for session: {SessionId}, {Count} messages",
             sessionId,
-            history.Count
+            entities.Count
         );
 
-        return new OkObjectResult(history);
+        return new OkObjectResult(entities);
     }
 }

@@ -1,6 +1,6 @@
 using ConfluenceChatRAG.Data.Models.Config;
-using ConfluenceChatRAG.Data.Models.Dto;
 using ConfluenceChatRAG.Data.Services;
+using ConfluenceChatRAG.Data.Db;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -19,7 +19,7 @@ public class Chat(ILogger<Chat> logger, IConfiguration config, ChatHistoryServic
         var appConfig = config.Get<AppConfig>();
 
         // Read and deserialize request body
-    ChatMessageDto request = await req.ReadFromJsonAsync<ChatMessageDto>();
+        ChatMessageEntity request = await req.ReadFromJsonAsync<ChatMessageEntity>();
 
         // Handle session creation/retrieval
         var sessionId =
@@ -34,7 +34,7 @@ public class Chat(ILogger<Chat> logger, IConfiguration config, ChatHistoryServic
             sessionId
         );
 
-        logger.LogInformation("Chat question: {Question}", request.Question);
+    logger.LogInformation("Chat question: {Question}", request.Content);
 
         // Get chat history for this session
         var history = await historyService.GetHistoryAsync(sessionId);
@@ -42,10 +42,13 @@ public class Chat(ILogger<Chat> logger, IConfiguration config, ChatHistoryServic
 
         // Chat completion with function calling - LLM decides when to search
         var chatService = new ChatCompletionService(appConfig);
-        var (answer, sources, suggestions) = await chatService.GetAnswerWithToolsAsync(
-            request.Question,
+        var result = await chatService.GetAnswerWithToolsAsync(
+            request.Content,
             history
         );
+        var answer = result.Item1;
+        var sources = result.Item2;
+        var suggestions = result.Item3;
 
         logger.LogInformation(
             "Response generated. Sources used: {Count}, Suggestions: {SuggestionCount}",
@@ -54,17 +57,18 @@ public class Chat(ILogger<Chat> logger, IConfiguration config, ChatHistoryServic
         );
 
         // Store the current exchange in history (with metadata for assistant message)
-        await historyService.AddUserMessageAsync(sessionId, request.Question);
+    await historyService.AddUserMessageAsync(sessionId, request.Content);
         await historyService.AddAssistantMessageAsync(sessionId, answer, sources, suggestions);
 
         return new OkObjectResult(
-            new ChatMessageDto
+            new ChatMessageEntity
             {
                 SessionId = sessionId,
-                Question = request.Question,
-                Answer = answer,
+                IsUser = false,
+                Content = answer,
                 Sources = sources,
                 Suggestions = suggestions,
+                Timestamp = DateTimeOffset.UtcNow
             }
         );
     }

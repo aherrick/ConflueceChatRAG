@@ -65,7 +65,7 @@ Do NOT add line breaks in the suggestions section. Keep the ### delimiter and JS
         {
             conversation.AddRange(
                 chatHistory.Select(m =>
-                    m.Role == "user"
+                    m.IsUser
                         ? (ChatMessage)new UserChatMessage(m.Content)
                         : new AssistantChatMessage(m.Content)
                 )

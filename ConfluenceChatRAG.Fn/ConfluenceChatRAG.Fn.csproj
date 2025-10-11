@@ -21,10 +21,4 @@
     <ProjectReference Include="..\ConfluenceChatRAG.Data\ConfluenceChatRAG.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="certificate.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

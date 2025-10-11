@@ -37,13 +37,10 @@
             <div class="mx-auto" style="max-width: 800px;">
                 @foreach (var m in _messages)
                 {
-                    var isUser = !string.IsNullOrEmpty(m.Question) && string.IsNullOrEmpty(m.Answer);
-                    var isAssistant = !string.IsNullOrEmpty(m.Answer);
-                    var messageText = isUser ? m.Question : m.Answer;
-                    <div class="d-flex mb-3 @(isUser ? "justify-content-end" : "justify-content-start")">
-                        <div class="@(isUser ? "bg-primary text-white" : "bg-white border") rounded-3 p-3" style="max-width: 75%;">
-                            <div class="small fw-semibold mb-1 @(isUser ? "text-white-50" : "text-muted")">
-                                @if (isUser)
+                    <div class="d-flex mb-3 @(m.IsUser ? "justify-content-end" : "justify-content-start")">
+                        <div class="@(m.IsUser ? "bg-primary text-white" : "bg-white border") rounded-3 p-3" style="max-width: 75%;">
+                            <div class="small fw-semibold mb-1 @(m.IsUser ? "text-white-50" : "text-muted")">
+                                @if (m.IsUser)
                                 {
                                     <span>You</span>
                                 }
@@ -52,7 +49,7 @@
                                     <i class="bi bi-stars me-1"></i><span>Assistant</span>
                                 }
                             </div>
-                            @if (isAssistant && _busy && string.IsNullOrEmpty(m.Answer))
+                            @if (!m.IsUser && _busy && string.IsNullOrEmpty(m.Content))
                             {
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="spinner-border spinner-border-sm text-primary" role="status">
@@ -61,20 +58,20 @@
                                     <span class="text-muted">Thinking...</span>
                                 </div>
                             }
-                            else if (!string.IsNullOrEmpty(messageText))
+                            else if (!string.IsNullOrEmpty(m.Content))
                             {
-                                @if (isUser)
+                                @if (m.IsUser)
                                 {
-                                    <div style="white-space: pre-wrap;">@messageText</div>
+                                    <div style="white-space: pre-wrap;">@m.Content</div>
                                 }
                                 else
                                 {
                                     <div class="markdown-content">
-                                        @((MarkupString)Markdown.ToHtml(messageText))
+                                        @((MarkupString)Markdown.ToHtml(m.Content))
                                     </div>
                                 }
                             }
-                            <div class="small @(isUser ? "text-white-50" : "text-muted") mt-1">@m.Time.ToLocalTime().ToString("g")</div>
+                            <div class="small @(m.IsUser ? "text-white-50" : "text-muted") mt-1">@m.Timestamp.ToLocalTime().ToString("g")</div>
 
                             @if (m.Sources?.Count > 0)
                             {
@@ -167,7 +164,7 @@
     [Parameter]
     public string SessionId { get; set; }
 
-    private List<ChatMessageDto> _messages = null;
+    private List<ChatMessageEntity> _messages = null;
     private string _input = string.Empty;
     private bool _busy;
     private string _sessionId;
@@ -223,7 +220,7 @@
         var response = await Api.GetAsync($"/api/ChatSession/{_sessionId}/history");
         if (response.IsSuccessStatusCode)
         {
-            var historyData = await response.Content.ReadFromJsonAsync<List<ChatMessageDto>>();
+            var historyData = await response.Content.ReadFromJsonAsync<List<ChatMessageEntity>>();
             if (historyData?.Count > 0)
             {
                 _messages = historyData;
@@ -247,11 +244,11 @@
         var question = _input.Trim();
         _input = string.Empty;
 
-        var userMessage = new ChatMessageDto { Question = question, Time = DateTimeOffset.UtcNow, SessionId = _sessionId };
+    var userMessage = new ChatMessageEntity { IsUser = true, Content = question, Timestamp = DateTimeOffset.UtcNow, SessionId = _sessionId };
         _messages.Add(userMessage);
 
         // Add assistant message placeholder
-        var assistantMessage = new ChatMessageDto { Time = DateTimeOffset.UtcNow, SessionId = _sessionId };
+    var assistantMessage = new ChatMessageEntity { IsUser = false, Timestamp = DateTimeOffset.UtcNow, SessionId = _sessionId };
         _messages.Add(assistantMessage);
 
         _busy = true;
@@ -260,17 +257,17 @@
 
         try
         {
-            var req = new ChatMessageDto { Question = question, SessionId = _sessionId };
+            var req = new ChatMessageEntity { IsUser = true, Content = question, SessionId = _sessionId };
             var resp = await Api.PostAsJsonAsync("/api/chat", req);
 
             if (!resp.IsSuccessStatusCode)
             {
-                assistantMessage.Answer = $"Error {(int)resp.StatusCode}: {resp.ReasonPhrase}";
+                assistantMessage.Content = $"Error {(int)resp.StatusCode}: {resp.ReasonPhrase}";
                 _pendingScroll = true;
                 return;
             }
 
-            var dto = await resp.Content.ReadFromJsonAsync<ChatMessageDto>();
+            var dto = await resp.Content.ReadFromJsonAsync<ChatMessageEntity>();
 
             if (dto?.SessionId != null && _sessionId != dto.SessionId)
             {
@@ -279,7 +276,7 @@
             }
 
             // Update the existing message with actual response
-            assistantMessage.Answer = dto?.Answer ?? "(empty response)";
+            assistantMessage.Content = dto?.Content ?? "(empty response)";
             assistantMessage.Sources = dto?.Sources ?? [];
             assistantMessage.Suggestions = dto?.Suggestions ?? [];
 
@@ -287,12 +284,12 @@
         }
         catch (Exception ex)
         {
-            assistantMessage.Answer = $"Request failed: {ex.Message}";
+            assistantMessage.Content = $"Request failed: {ex.Message}";
             _pendingScroll = true;
         }
         finally
         {
-            assistantMessage.Time = DateTimeOffset.UtcNow;
+            assistantMessage.Timestamp = DateTimeOffset.UtcNow;
             _busy = false;
             StateHasChanged();
             await Task.Delay(100);
@@ -308,5 +305,5 @@
         _ = SendAsync();
     }
 
-    // ChatMessage class removed; using ChatMessageDto for both request and response
+    // Single unified ChatMessageEntity model used across UI/API/DB
 }

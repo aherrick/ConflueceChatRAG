@@ -33,7 +33,7 @@ public class ChatHistoryService(IDbContextFactory<ChatHistoryDbContext> contextF
             new ChatMessageEntity
             {
                 SessionId = sessionId,
-                Role = "user",
+                IsUser = true,
                 Content = message,
                 Timestamp = DateTimeOffset.UtcNow,
             }
@@ -55,7 +55,7 @@ public class ChatHistoryService(IDbContextFactory<ChatHistoryDbContext> contextF
         var entity = new ChatMessageEntity
         {
             SessionId = sessionId,
-            Role = "assistant",
+            IsUser = false,
             Content = message,
             Timestamp = DateTimeOffset.UtcNow,
         };
