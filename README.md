@@ -9,7 +9,7 @@ A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI 
 ## 🛠️ Stack
 
 - **.NET 10** - Blazor WebAssembly + Azure Functions
-- **Azure OpenAI** - GPT-4.1 for chat completion
+- **Azure OpenAI** - Bring your own chat deployment
 - **Azure AI Search** - Vector search with embeddings
 - **SQL Server** - Persistent chat history with EF Core
 - **Bootstrap 5** - UI framework
