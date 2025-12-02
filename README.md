@@ -1,12 +1,14 @@
 ﻿# 🚀 Confluence Chat RAG
 
 [![build](https://github.com/aherrick/ConflueceChatRAG/actions/workflows/build.yml/badge.svg)](https://github.com/aherrick/ConflueceChatRAG/actions/workflows/build.yml)
+[![publish-web](https://github.com/aherrick/ConflueceChatRAG/actions/workflows/publish-web.yml/badge.svg)](https://github.com/aherrick/ConflueceChatRAG/actions/workflows/publish-web.yml)
+[![publish-fn](https://github.com/aherrick/ConflueceChatRAG/actions/workflows/publish-fn.yml/badge.svg)](https://github.com/aherrick/ConflueceChatRAG/actions/workflows/publish-fn.yml)
 
 A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI and Azure AI Search for intelligent, context-aware responses from Confluence documentation. 🤖📚
 
 ## 🛠️ Stack
 
-- **.NET 10** - Blazor Server + Azure Functions
+- **.NET 10** - Blazor WebAssembly + Azure Functions
 - **Azure OpenAI** - GPT-4.1 for chat completion
 - **Azure AI Search** - Vector search with embeddings
 - **SQL Server** - Persistent chat history with EF Core
@@ -14,9 +16,11 @@ A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI 
 
 ## 📦 Projects
 
-- **ConfluenceChatRAG** - Blazor Server UI
-- **ConfluenceChatRAG.Fn** - Azure Functions API (chat, history)
-- **ConfluenceChatRAG.Data** - Shared models and services
+| Project | Description |
+|---------|-------------|
+| **ConfluenceChatRAG** | Blazor WebAssembly UI (hosted on Azure Static Web Apps) |
+| **ConfluenceChatRAG.Fn** | Azure Functions API (chat, history, index rebuild) |
+| **ConfluenceChatRAG.Data** | Shared models, DTOs, and services |
 
 ## ⚡ Quick Start
 
@@ -28,7 +32,7 @@ A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI 
        "IndexName": "confluence-pages",
        "ConfluenceOrg": "your-org-name",
        "AzureOpenAI:Endpoint": "https://your-openai.cognitiveservices.azure.com/",
-       "AzureOpenAI:EmbeddingDeployment": "text-embedding-3-large", 
+       "AzureOpenAI:EmbeddingDeployment": "text-embedding-3-large",
        "AzureOpenAI:ChatDeployment": "gpt-4.1",
        "AzureOpenAI:ApiKey": "your-openai-api-key",
        "AzureAISearch:Endpoint": "https://your-search.search.windows.net",
@@ -37,31 +41,38 @@ A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI 
    }
    ```
 
-2. **Configure `appsettings.json`** in `ConfluenceChatRAG`:
+2. **Configure `appsettings.json`** in `ConfluenceChatRAG/wwwroot`:
    ```json
    {
-     "LogoBase64": "your-base64-encoded-logo-here"
+     "LogoUrl": "https://your-domain.com/logo.png"
    }
    ```
 
-3. **Start Azurite** (for timer triggers):
+3. **Start Azurite** (for local Azure Storage emulation):
    ```powershell
-   .\start-azurite.ps1
+   azurite --silent
    ```
 
 ## ▶️ How to Run
 
-You must run both the Blazor Server app and the Azure Functions API at the same time:
+Run both the Blazor WebAssembly app and the Azure Functions API:
 
 ```bash
-# In one terminal (Blazor UI)
-dotnet run --project ConflueceChatRAG
+# Terminal 1 - Blazor WASM UI
+dotnet run --project ConfluenceChatRAG
 
-# In another terminal (Azure Functions API)
-dotnet run --project ConfluenceChatRAG.Fn
+# Terminal 2 - Azure Functions API
+func start --project ConfluenceChatRAG.Fn
 ```
 
-The Blazor app will communicate with the API via HTTP while both are running. 🖥️🔗🧩
+The Blazor app runs entirely in the browser and communicates with the Azure Functions API. 🖥️🔗🧩
+
+## 🚀 Deployment
+
+- **Web App**: Deployed to Azure Static Web Apps via `publish-web.yml`
+- **Functions**: Deployed to Azure Functions via `publish-fn.yml`
+
+Both workflows are triggered manually via `workflow_dispatch`.
 
 ## ✨ Features
 

@@ -10,39 +10,51 @@ public class ConfluenceService(string confluenceOrg)
     private readonly HttpClient _httpClient = new();
     private readonly string _rootUrl = $"https://{confluenceOrg}.atlassian.net/wiki";
 
-    public async Task<List<ConfluencePageDto>> GetPages()
+    public async Task<List<ConfluencePageDto>> GetPages(string spaceKey = null)
     {
         var pages = new List<ConfluencePageDto>();
 
-        // Fetch all spaces (recursively handles pagination)
-        var spaces = await GetSpacesAsync($"{_rootUrl}/rest/api/space?limit=100&start=0");
-
-        foreach (var space in spaces)
+        if (!string.IsNullOrWhiteSpace(spaceKey))
         {
-            try
+            // Fetch only the specified space
+            await FetchSpacePagesAsync(spaceKey, pages);
+        }
+        else
+        {
+            // Fetch all spaces (recursively handles pagination)
+            var spaces = await GetSpacesAsync($"{_rootUrl}/rest/api/space?limit=100&start=0");
+
+            foreach (var space in spaces)
             {
-                await GetPagesForSpaceAsync(
-                    $"{_rootUrl}/rest/api/space/{Uri.EscapeDataString(space.Key)}/content/page?limit=100&start=0&expand=body.storage",
-                    space.Key,
-                    pages
-                );
-            }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-            {
-                Console.Error.WriteLine($"[WARN] 404 for space '{space.Key}', skipping.");
-            }
-            catch (HttpRequestException ex)
-                when (ex.StatusCode == HttpStatusCode.Forbidden
-                    || ex.StatusCode == HttpStatusCode.Unauthorized
-                )
-            {
-                Console.Error.WriteLine(
-                    $"[WARN] Space '{space.Key}' not public ({(int?)ex.StatusCode}), skipping."
-                );
+                try
+                {
+                    await FetchSpacePagesAsync(space.Key, pages);
+                }
+                catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    Console.Error.WriteLine($"[WARN] 404 for space '{space.Key}', skipping.");
+                }
+                catch (HttpRequestException ex)
+                    when (ex.StatusCode == HttpStatusCode.Forbidden
+                        || ex.StatusCode == HttpStatusCode.Unauthorized
+                    )
+                {
+                    Console.Error.WriteLine(
+                        $"[WARN] Space '{space.Key}' not public ({(int?)ex.StatusCode}), skipping."
+                    );
+                }
             }
         }
 
         return pages;
+    }
+
+    private async Task FetchSpacePagesAsync(string spaceKey, List<ConfluencePageDto> pages)
+    {
+        var startUrl =
+            $"{_rootUrl}/rest/api/space/{Uri.EscapeDataString(spaceKey)}/content/page?limit=100&start=0&expand=body.storage";
+
+        await GetPagesForSpaceAsync(startUrl, spaceKey, pages);
     }
 
     private async Task<List<ConfluenceSpace.Space>> GetSpacesAsync(string url)

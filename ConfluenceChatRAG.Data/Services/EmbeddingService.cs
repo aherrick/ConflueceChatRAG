@@ -42,6 +42,13 @@ public class EmbeddingService
     )
     {
         await Collection.EnsureCollectionDeletedAsync();
+
+        // Wait until actually gone
+        while (await Collection.CollectionExistsAsync())
+        {
+            await Task.Delay(500);
+        }
+
         await Collection.EnsureCollectionExistsAsync();
 
         int pageCount = 0;
@@ -92,11 +99,21 @@ public class EmbeddingService
             Properties =
             {
                 new VectorStoreKeyProperty(nameof(ConfluencePageVector.Key), typeof(string)),
+                // Name: full-text searchable (and filterable if you want)
                 new VectorStoreDataProperty(nameof(ConfluencePageVector.Name), typeof(string)),
+                //{
+                //    IsFullTextIndexed = true,
+                //    IsIndexed = true,
+                //},
+                // Description: full-text searchable
                 new VectorStoreDataProperty(
                     nameof(ConfluencePageVector.Description),
                     typeof(string)
                 ),
+                //{
+                //    IsFullTextIndexed = true,
+                //    IsIndexed = true,
+                //},
                 new VectorStoreDataProperty(nameof(ConfluencePageVector.Url), typeof(string)),
                 new VectorStoreVectorProperty(
                     nameof(ConfluencePageVector.Vector),

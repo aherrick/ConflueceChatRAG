@@ -1,7 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using ConfluenceChatRAG.Data.Models.Dto;
 
 namespace ConfluenceChatRAG.Data.Db;

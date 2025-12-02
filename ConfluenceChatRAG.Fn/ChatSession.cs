@@ -22,7 +22,7 @@ public class ChatSession(ILogger<ChatSession> logger, ChatHistoryService history
             "get",
             Route = "ChatSession/{sessionId}/history"
         )]
-            HttpRequest req,
+			HttpRequest _,
         string sessionId
     )
     {
@@ -34,7 +34,7 @@ public class ChatSession(ILogger<ChatSession> logger, ChatHistoryService history
         }
 
         // Only include suggestions for the last assistant message
-    var lastAssistantEntry = entities.LastOrDefault(e => !e.IsUser);
+        var lastAssistantEntry = entities.LastOrDefault(e => !e.IsUser);
         foreach (var entry in entities)
         {
             if (entry != lastAssistantEntry)
@@ -43,11 +43,14 @@ public class ChatSession(ILogger<ChatSession> logger, ChatHistoryService history
             }
         }
 
-        logger.LogInformation(
-            "Retrieved history for session: {SessionId}, {Count} messages",
-            sessionId,
-            entities.Count
-        );
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation(
+                "Retrieved history for session: {SessionId}, {Count} messages",
+                sessionId,
+                entities.Count
+            );
+        }
 
         return new OkObjectResult(entities);
     }

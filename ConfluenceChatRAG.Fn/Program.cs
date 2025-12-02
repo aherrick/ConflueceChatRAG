@@ -16,14 +16,18 @@ builder
 
 builder.Services.AddDbContextFactory<ChatHistoryDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration["SqlConnectionString"], sqlOptions =>
-    {
-        // Enable connection resiliency with automatic retries for transient failures
-        sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 10,           // Retry up to 10 times
-            maxRetryDelay: TimeSpan.FromSeconds(60),  // Max delay between retries
-            errorNumbersToAdd: null);   // Use default transient error numbers
-    });
+    options.UseSqlServer(
+        builder.Configuration["SqlConnectionString"],
+        sqlOptions =>
+        {
+            // Enable connection resiliency with automatic retries for transient failures
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 10, // Retry up to 10 times
+                maxRetryDelay: TimeSpan.FromSeconds(60), // Max delay between retries
+                errorNumbersToAdd: null
+            ); // Use default transient error numbers
+        }
+    );
     // Default to NoTracking to keep read operations lightweight. When an update is required,
     // re-query with AsTracking() or call context.ChatMessages.Update(entity) before SaveChanges().
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);

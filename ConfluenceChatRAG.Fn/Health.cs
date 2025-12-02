@@ -20,6 +20,7 @@ public class Health(ILogger<Health> logger, IConfiguration config)
             {
                 Status = "Healthy",
                 Environment = appConfig.ConfluenceOrg ?? "Unknown",
+                ChatDeployment = appConfig.AzureOpenAI?.ChatDeployment ?? "Unknown",
                 Timestamp = DateTime.UtcNow,
             }
         );
