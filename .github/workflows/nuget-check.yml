@@ -1,0 +1,33 @@
+name: nuget-check
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  check-outdated:
+    runs-on: ubuntu-latest
+    name: Check for outdated NuGet packages
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Check for outdated packages
+        run: |
+          echo "Checking for outdated NuGet packages..."
+          dotnet list package --outdated --include-transitive > outdated.txt
+          cat outdated.txt
+          
+          # Fail if any outdated packages are found
+          if grep -q ">" outdated.txt; then
+            echo "❌ Outdated packages found!"
+            exit 1
+          else
+            echo "✅ All packages are up to date"
+          fi
