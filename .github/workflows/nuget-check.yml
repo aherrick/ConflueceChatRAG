@@ -24,9 +24,9 @@ jobs:
           dotnet list package --outdated --include-prerelease > outdated.txt
           cat outdated.txt
           
-          # Extract and display outdated packages with versions
+          # Extract and display all packages with versions
           echo ""
-          echo "Outdated packages found:"
+          echo "Packages checked:"
           grep -E "^\s+>" outdated.txt | grep -v "Not found" | while read line; do
             pkg=$(echo "$line" | awk '{print $2}')
             current=$(echo "$line" | awk '{print $3}')
