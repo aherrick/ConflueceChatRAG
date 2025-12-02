@@ -16,30 +16,14 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Build Blazor WASM
-        run: dotnet publish ConfluenceChatRAG/ConfluenceChatRAG.csproj -c Release -o ./published
-
-      - name: Show published structure
-        run: |
-          echo "--- Published folder structure ---"
-          find ./published -type f -name "*.json" | head -20
-          echo "--- Looking for appsettings.json ---"
-          find ./published -name "appsettings.json"
-
       - name: Inject API URL into appsettings.json
         run: |
           API_URL=$(echo "${{ secrets.CONFLUENCE_CHAT_API_URL }}" | tr -d '\n\r')
-          jq --arg url "$API_URL" '. + {"ConfluenceChatApiUrl": $url}' published/wwwroot/appsettings.json > tmp.json
-          mv tmp.json published/wwwroot/appsettings.json
-          echo "--- appsettings.json after injection ---"
-          cat published/wwwroot/appsettings.json
+          jq --arg url "$API_URL" '. + {"ConfluenceChatApiUrl": $url}' ConfluenceChatRAG/wwwroot/appsettings.json > tmp.json
+          mv tmp.json ConfluenceChatRAG/wwwroot/appsettings.json
 
-      - name: Verify files before deploy
-        run: |
-          echo "--- Files in published/wwwroot ---"
-          ls -la published/wwwroot/
-          echo "--- appsettings.json content ---"
-          cat published/wwwroot/appsettings.json
+      - name: Build Blazor WASM
+        run: dotnet publish ConfluenceChatRAG/ConfluenceChatRAG.csproj -c Release -o ./published
 
       - name: Deploy to Azure Static Web App
         uses: Azure/static-web-apps-deploy@v1
