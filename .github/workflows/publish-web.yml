@@ -21,7 +21,8 @@ jobs:
 
       - name: Inject API URL into appsettings.json
         run: |
-          jq '. + {"ConfluenceChatApiUrl": "${{ secrets.CONFLUENCE_CHAT_API_URL }}"}' published/wwwroot/appsettings.json > tmp.json
+          API_URL=$(echo "${{ secrets.CONFLUENCE_CHAT_API_URL }}" | tr -d '\n\r')
+          jq --arg url "$API_URL" '. + {"ConfluenceChatApiUrl": $url}' published/wwwroot/appsettings.json > tmp.json
           mv tmp.json published/wwwroot/appsettings.json
           echo "--- appsettings.json after injection ---"
           cat published/wwwroot/appsettings.json
