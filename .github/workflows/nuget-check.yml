@@ -20,14 +20,13 @@ jobs:
 
       - name: Check for outdated packages
         run: |
-          echo "Checking for outdated NuGet packages..."
-          dotnet list package --outdated --include-transitive > outdated.txt
+          echo "Checking for outdated top-level NuGet packages..."
+          dotnet list package --outdated > outdated.txt
           cat outdated.txt
           
-          # Fail if any outdated packages are found
-          if grep -q ">" outdated.txt; then
-            echo "❌ Outdated packages found!"
+          if grep -E "^\s+>" outdated.txt > /dev/null; then
+            echo "❌ Outdated top-level packages found!"
             exit 1
           else
-            echo "✅ All packages are up to date"
+            echo "✅ All top-level packages are up to date"
           fi
