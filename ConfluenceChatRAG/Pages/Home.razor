@@ -169,21 +169,6 @@
 	  if (!el) return;
 	  requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
 	};
-	
-	window.__observeScroll = (el) => {
-	  if (!el) return;
-	  // Scroll immediately
-	  el.scrollTop = el.scrollHeight;
-	  // Use MutationObserver to watch for DOM changes and keep scrolling
-	  const observer = new MutationObserver(() => {
-	    requestAnimationFrame(() => {
-	      el.scrollTop = el.scrollHeight;
-	    });
-	  });
-	  observer.observe(el, { childList: true, subtree: true });
-	  // Stop observing after 3 seconds to avoid unnecessary work
-	  setTimeout(() => observer.disconnect(), 3000);
-	};
 </script>
 
 @code {
@@ -258,13 +243,8 @@
 			if (historyData?.Count > 0)
 			{
 				_messages = historyData;
+				_pendingScroll = true;
 				StateHasChanged();
-				// Call JS directly to scroll after messages render
-				try
-				{
-					await JS.InvokeVoidAsync("__observeScroll", _messagesEl);
-				}
-				catch { /* ignore */ }
 			}
 		}
 	}
