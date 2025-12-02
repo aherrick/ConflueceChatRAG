@@ -49,11 +49,6 @@ A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI 
    }
    ```
 
-3. **Start Azurite** (for local Azure Storage emulation):
-   ```powershell
-   azurite --silent
-   ```
-
 ## ▶️ How to Run
 
 Run both the Blazor WebAssembly app and the Azure Functions API:
