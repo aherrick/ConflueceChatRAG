@@ -23,6 +23,8 @@ jobs:
         run: |
           jq '. + {"ConfluenceChatApiUrl": "${{ secrets.CONFLUENCE_CHAT_API_URL }}"}' published/wwwroot/appsettings.json > tmp.json
           mv tmp.json published/wwwroot/appsettings.json
+          echo "--- appsettings.json after injection ---"
+          cat published/wwwroot/appsettings.json
 
       - name: Deploy to Azure Static Web App
         uses: Azure/static-web-apps-deploy@v1
