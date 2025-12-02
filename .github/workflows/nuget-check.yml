@@ -18,14 +18,72 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Install dotnet-outdated
-        run: dotnet tool install --global dotnet-outdated-tool
-
-      - name: Check for outdated packages with dotnet-outdated
+      - name: Check for outdated packages via NuGet API
         shell: bash
-        env:
-          DOTNET_TOOLS: $HOME/.dotnet/tools
         run: |
-          export PATH="$DOTNET_TOOLS:$PATH"
-          echo "Running dotnet-outdated (including prerelease, fail on updates)..."
-          dotnet outdated --pre-release Always --fail-on-updates
+          echo "Scanning csproj files for PackageReference entries..."
+
+          has_updates=0
+
+          # Find all csproj files under the repo
+          mapfile -t CSPROJS < <(find . -name '*.csproj')
+
+          if [ ${#CSPROJS[@]} -eq 0 ]; then
+            echo "No .csproj files found."
+            exit 0
+          fi
+
+          for csproj in "${CSPROJS[@]}"; do
+            echo ""
+            echo "=== Project: $csproj ==="
+
+            # Extract (PackageId, Version) pairs from PackageReference elements
+            # Assumes common form: <PackageReference Include="X" Version="Y" />
+            mapfile -t PACKAGES < <(
+              grep -oP '<PackageReference[^>]*Include="\K[^"]+|Version="\K[^"]+' "$csproj" \
+              | paste -d ' ' - -
+            )
+
+            if [ ${#PACKAGES[@]} -eq 0 ]; then
+              echo "  (no PackageReference entries found)"
+              continue
+            fi
+
+            for line in "${PACKAGES[@]}"; do
+              pkg=$(echo "$line" | awk '{print $1}')
+              current=$(echo "$line" | awk '{print $2}')
+
+              # Query NuGet v3 API for metadata
+              url="https://api.nuget.org/v3-flatcontainer/${pkg,,}/index.json"
+
+              # Fetch versions JSON; if fails, mark as unknown but don't fail build for that package
+              json=$(curl -sSf "$url" || true)
+              if [ -z "$json" ]; then
+                echo "  ⚠️  $pkg: $current (could not query NuGet)"
+                continue
+              fi
+
+              # Get the last version in the versions array (latest published)
+              latest=$(echo "$json" | jq -r '.versions[-1]')
+
+              if [ -z "$latest" ] || [ "$latest" = "null" ]; then
+                echo "  ⚠️  $pkg: $current (no versions returned)"
+                continue
+              fi
+
+              if [ "$current" != "$latest" ]; then
+                echo "  ❌ $pkg: $current → $latest"
+                has_updates=1
+              else
+                echo "  ✅ $pkg: $current"
+              fi
+            done
+          done
+
+          echo ""
+          if [ "$has_updates" -ne 0 ]; then
+            echo "❌ Outdated packages found."
+            exit 1
+          else
+            echo "✅ All referenced packages are up to date."
+          fi
