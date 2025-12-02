@@ -5,9 +5,7 @@
 @inject IJSRuntime JS
 @inject IConfiguration Configuration
 @using System.Net.Http.Json
-@using System.Text.Json
-@using ConfluenceChatRAG.Data.Models.Dto
-@using ConfluenceChatRAG.Data.Db
+@using ConfluenceChatRAG.Shared
 @using Markdig
 
 <div class="d-flex flex-column h-100">
@@ -197,10 +195,10 @@
 		// Fetch chat deployment name
 		try
 		{
-			var health = await Api.GetFromJsonAsync<JsonElement>("/api/Health");
-			if (health.TryGetProperty("chatDeployment", out var deployment))
+			var health = await Api.GetFromJsonAsync<HealthResponse>("/api/Health");
+			if (!string.IsNullOrEmpty(health?.ChatDeployment))
 			{
-				_chatDeployment = deployment.GetString() ?? "AI";
+				_chatDeployment = health.ChatDeployment;
 			}
 		}
 		catch { /* Use default */ }

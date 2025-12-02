@@ -22,7 +22,7 @@ public class ChatSession(ILogger<ChatSession> logger, ChatHistoryService history
             "get",
             Route = "ChatSession/{sessionId}/history"
         )]
-			HttpRequest _,
+            HttpRequest _,
         string sessionId
     )
     {

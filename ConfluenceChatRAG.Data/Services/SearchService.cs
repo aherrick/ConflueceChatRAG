@@ -1,5 +1,4 @@
 using ConfluenceChatRAG.Data.Models.Config;
-using ConfluenceChatRAG.Data.Models.Dto;
 using Microsoft.Extensions.AI;
 
 namespace ConfluenceChatRAG.Data.Services;

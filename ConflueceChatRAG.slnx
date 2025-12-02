@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="ConfluenceChatRAG.Data/ConfluenceChatRAG.Data.csproj" Id="5e989b87-15c0-4a4a-8d86-e1bdb4f4edb1" />
   <Project Path="ConfluenceChatRAG.Fn/ConfluenceChatRAG.Fn.csproj" Id="0f079bdf-d4a1-4455-8ddd-21e8d71df5fe" />
+  <Project Path="ConfluenceChatRAG.Shared/ConfluenceChatRAG.Shared.csproj" />
   <Project Path="ConfluenceChatRAG/ConfluenceChatRAG.csproj" />
 </Solution>

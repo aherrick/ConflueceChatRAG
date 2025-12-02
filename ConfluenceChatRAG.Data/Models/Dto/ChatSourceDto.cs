@@ -1,9 +1,6 @@
-﻿namespace ConfluenceChatRAG.Data.Models.Dto;
+﻿// Re-export from Shared for backwards compatibility
+global using ChatSourceDto = ConfluenceChatRAG.Shared.ChatSourceDto;
 
-public class ChatSourceDto
-{
-    public string Title { get; set; }
-    public string Content { get; set; }
-    public double Score { get; set; }
-    public string Url { get; set; }
-}
+namespace ConfluenceChatRAG.Data.Models.Dto;
+
+// ChatSourceDto is now defined in ConfluenceChatRAG.Shared

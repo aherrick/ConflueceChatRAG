@@ -1,4 +1,3 @@
-using ConfluenceChatRAG.Data.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

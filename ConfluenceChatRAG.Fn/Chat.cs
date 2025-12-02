@@ -1,6 +1,6 @@
-using ConfluenceChatRAG.Data.Db;
 using ConfluenceChatRAG.Data.Models.Config;
 using ConfluenceChatRAG.Data.Services;
+using ConfluenceChatRAG.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;

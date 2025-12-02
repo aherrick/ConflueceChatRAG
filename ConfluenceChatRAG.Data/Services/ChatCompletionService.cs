@@ -1,9 +1,7 @@
 ﻿using System.Text.Json;
 using Azure;
 using Azure.AI.OpenAI;
-using ConfluenceChatRAG.Data.Db;
 using ConfluenceChatRAG.Data.Models.Config;
-using ConfluenceChatRAG.Data.Models.Dto;
 using OpenAI.Chat;
 
 namespace ConfluenceChatRAG.Data.Services;

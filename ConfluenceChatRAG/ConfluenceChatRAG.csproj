@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ConfluenceChatRAG.Data\ConfluenceChatRAG.Data.csproj" />
+		<ProjectReference Include="..\ConfluenceChatRAG.Shared\ConfluenceChatRAG.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

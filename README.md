@@ -20,7 +20,8 @@ A Retrieval-Augmented Generation (RAG) chat application powered by Azure OpenAI 
 |---------|-------------|
 | **ConfluenceChatRAG** | Blazor WebAssembly UI (hosted on Azure Static Web Apps) |
 | **ConfluenceChatRAG.Fn** | Azure Functions API (chat, history, index rebuild) |
-| **ConfluenceChatRAG.Data** | Shared models, DTOs, and services |
+| **ConfluenceChatRAG.Data** | Server-side services (EF Core, AI Search, OpenAI) |
+| **ConfluenceChatRAG.Shared** | Shared DTOs and models (used by both WASM and API) |
 
 ## ⚡ Quick Start
 

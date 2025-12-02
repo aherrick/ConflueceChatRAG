@@ -1,5 +1,4 @@
 using ConfluenceChatRAG.Data.Db;
-using ConfluenceChatRAG.Data.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConfluenceChatRAG.Data.Services;
