@@ -19,6 +19,13 @@ jobs:
       - name: Build Blazor WASM
         run: dotnet publish ConfluenceChatRAG/ConfluenceChatRAG.csproj -c Release -o ./published
 
+      - name: Show published structure
+        run: |
+          echo "--- Published folder structure ---"
+          find ./published -type f -name "*.json" | head -20
+          echo "--- Looking for appsettings.json ---"
+          find ./published -name "appsettings.json"
+
       - name: Inject API URL into appsettings.json
         run: |
           API_URL=$(echo "${{ secrets.CONFLUENCE_CHAT_API_URL }}" | tr -d '\n\r')
