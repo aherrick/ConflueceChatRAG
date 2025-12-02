@@ -75,6 +75,8 @@ The Blazor app runs entirely in the browser and communicates with the Azure Func
 
 Both workflows are triggered manually via `workflow_dispatch`.
 
+**Note:** The WASM app requires `ConfluenceChatApiUrl` to connect to the API. Since Blazor WASM is client-side, it can't read server environment variables. The `publish-web.yml` workflow injects this at build time from the `CONFLUENCE_CHAT_API_URL` GitHub secret. For local dev, it falls back to `http://localhost:7082`.
+
 ## ✨ Features
 
 - 💾 **Persistent Chat History** - SQL database with EF Core
