@@ -243,6 +243,7 @@
 			if (historyData?.Count > 0)
 			{
 				_messages = historyData;
+				await Task.Delay(100);
 				_pendingScroll = true;
 				StateHasChanged();
 			}
