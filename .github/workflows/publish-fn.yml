@@ -17,7 +17,6 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
-          dotnet-quality: 'preview'
 
       # Publish self-contained (choose RID to match your Function App OS)
       - name: Publish
@@ -34,4 +33,4 @@ jobs:
         with:
           app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
           package: './publish'
-          publish-profile: ${{ secrets.PP_CONFLUECECHATRAG_FN }}
+          publish-profile: ${{ secrets.PP_CONFLUENCE_RAG_CHAT_FN }}
