@@ -169,6 +169,11 @@
 	  if (!el) return;
 	  requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
 	};
+	
+	window.__observeScroll = (el) => {
+	  if (!el) return;
+	  setTimeout(() => window.__scrollToBottom(el), 150);
+	};
 </script>
 
 @code {
@@ -243,9 +248,13 @@
 			if (historyData?.Count > 0)
 			{
 				_messages = historyData;
-				await Task.Delay(100);
-				_pendingScroll = true;
 				StateHasChanged();
+				// Call JS directly to scroll after messages render
+				try
+				{
+					await JS.InvokeVoidAsync("__observeScroll", _messagesEl);
+				}
+				catch { /* ignore */ }
 			}
 		}
 	}
