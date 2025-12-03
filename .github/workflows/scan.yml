@@ -20,7 +20,7 @@ jobs:
         run: nuget install Roslynator.Analyzers -OutputDirectory analyzers -ExcludeVersion
 
       - name: Analyze
-        run: roslynator analyze ConfluenceChatRAG.slnx --analyzer-assemblies "analyzers/Roslynator.Analyzers/analyzers" --ignore-compiler-diagnostics
+        run: roslynator analyze ConflueceChatRAG.slnx --analyzer-assemblies "analyzers/Roslynator.Analyzers/analyzers" --ignore-compiler-diagnostics
         
       - name: Find unused private code
         continue-on-error: true
