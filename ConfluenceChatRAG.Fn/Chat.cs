@@ -26,7 +26,7 @@ public class Chat(ILogger<Chat> logger, IConfiguration config, ChatHistoryServic
             !string.IsNullOrEmpty(request.SessionId)
             && await historyService.SessionExistsAsync(request.SessionId)
                 ? request.SessionId
-                : historyService.CreateSession();
+                : ChatHistoryService.CreateSession();
 
         logger.LogInformation(
             "{Action} chat session: {SessionId}",
