@@ -7,7 +7,7 @@ public class ChatHistoryService(IDbContextFactory<ChatHistoryDbContext> contextF
 {
     private const int MaxMessagesPerSession = 20;
 
-    public string CreateSession()
+    public static string CreateSession()
     {
         return Guid.NewGuid().ToString();
     }

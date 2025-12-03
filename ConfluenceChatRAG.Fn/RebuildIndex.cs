@@ -12,13 +12,19 @@ public class RebuildIndexTimer(ILogger<RebuildIndexTimer> logger, IConfiguration
     [Function("RebuildIndexTimer")]
     public async Task Run([TimerTrigger("0 0 5 * * *", RunOnStartup = true)] TimerInfo timerInfo)
     {
-        logger.LogInformation("RebuildIndex timer function started at: {Time}", DateTime.UtcNow);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("RebuildIndex timer function started at: {Time}", DateTime.UtcNow);
+        }
 
         var appConfig = config.Get<AppConfig>();
 
         var confluenceService = new ConfluenceService(appConfig.ConfluenceOrg);
         var pages = await confluenceService.GetPages(spaceKey: "SCCS");
-        logger.LogInformation("Fetched {Count} pages", pages.Count);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Fetched {Count} pages", pages.Count);
+        }
 
         var embeddingService = new EmbeddingService(appConfig);
         var result = await embeddingService.RebuildIndexAsync(
@@ -26,11 +32,14 @@ public class RebuildIndexTimer(ILogger<RebuildIndexTimer> logger, IConfiguration
             appConfig.AzureOpenAI.EmbeddingDeployment
         );
 
-        logger.LogInformation(
-            "RebuildIndex complete. Pages={Pages}, Chunks={Chunks}",
-            result.PageCount,
-            result.ChunkCount
-        );
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation(
+                "RebuildIndex complete. Pages={Pages}, Chunks={Chunks}",
+                result.PageCount,
+                result.ChunkCount
+            );
+        }
 
         if (timerInfo.ScheduleStatus is not null)
         {

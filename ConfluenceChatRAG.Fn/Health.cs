@@ -11,7 +11,7 @@ namespace ConfluenceChatRAG.Fn;
 public class Health(ILogger<Health> logger, IConfiguration config)
 {
     [Function(nameof(Health))]
-    public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest _)
     {
         var appConfig = config.Get<AppConfig>();
         logger.LogInformation("Health check requested.");
